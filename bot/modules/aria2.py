@@ -78,14 +78,24 @@ class Aria2WebSocketServer:
             trackers: str = "[" + trackers_list.replace("\n\n", ",") + "]"
 
         cmd = [
-            "aria2c", f"--dir={str(download_path)}", "--enable-rpc",
-            "--rpc-listen-all=false", "--max-connection-per-server=10",
-            "--rpc-max-request-size=1024M", "--seed-time=0.01",
-            "--seed-ratio=0.1", "--max-concurrent-downloads=5",
-            "--min-split-size=10M", "--follow-torrent=mem", "--split=10",
-            "--bt-save-metadata=true", f"--bt-tracker={trackers}",
-            "--daemon=true", "--allow-overwrite=true"
+            "aria2c",
+            f'--dir={download_path}',
+            "--enable-rpc",
+            "--rpc-listen-all=false",
+            "--max-connection-per-server=10",
+            "--rpc-max-request-size=1024M",
+            "--seed-time=0.01",
+            "--seed-ratio=0.1",
+            "--max-concurrent-downloads=5",
+            "--min-split-size=10M",
+            "--follow-torrent=mem",
+            "--split=10",
+            "--bt-save-metadata=true",
+            f"--bt-tracker={trackers}",
+            "--daemon=true",
+            "--allow-overwrite=true",
         ]
+
         key_path = self.bot.getConfig["key_path"]
         if await (key_path / "cert.pem"
                   ).is_file() and await (key_path / "key.pem").is_file():
@@ -257,7 +267,7 @@ class Aria2WebSocketServer:
                 (file.complete and file.metadata) or file.removed):
                 continue
 
-            if file.complete and not file.metadata:
+            if file.complete:
                 if await file.is_dir():
                     counter = self.uploads[file.gid]["counter"]
                     length = len(file.files)
@@ -392,10 +402,15 @@ class Aria2WebSocketServer:
 
         port = util.aria2.get_free_port()
         cmd = [
-            "aria2c", "--enable-rpc", "--rpc-listen-all=false",
-            f"--rpc-listen-port={port}", "--bt-seed-unverified=true",
-            "--seed-ratio=1", f"-i {str(file_path)}"
+            "aria2c",
+            "--enable-rpc",
+            "--rpc-listen-all=false",
+            f"--rpc-listen-port={port}",
+            "--bt-seed-unverified=true",
+            "--seed-ratio=1",
+            f'-i {file_path}',
         ]
+
 
         future = self.bot.loop.create_future()
         transport = None
@@ -489,12 +504,11 @@ class Aria2(module.Module):
 
         status = res["status"]
         metadata = bool(res.get("followedBy"))
-        ret = None
         if status == "active":
             await self.client.forcePause(gid)
             await self.client.forceRemove(gid)
-        elif status == "complete" and metadata is True:
+        elif status == "complete" and metadata:
             return "__GID belongs to finished Metadata, can't be abort.__"
 
         self._ws.cancelled.add(gid)
-        return ret
+        return None

@@ -12,7 +12,7 @@ def setup_log() -> None:
     container = bool(os.environ.get("CONTAINER") == "True")
     logging.root.setLevel(level)
 
-    if container is True:
+    if container:
         formatter = logging.Formatter(
             "  %(levelname)-7s  |  %(name)-11s  |  %(message)s")
     else:

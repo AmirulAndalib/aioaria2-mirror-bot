@@ -122,9 +122,8 @@ class CommandDispatcher(Base):
                         raise TypeError("Second value must be int/float, "
                                         f"got: {type(ret[1])}")
                     await ctx.respond(ret[0], delete_after=ret[1])
-                else:
-                    if ret is not None:
-                        await ctx.respond(ret)
+                elif ret is not None:
+                    await ctx.respond(ret)
             except pyrogram.errors.MessageNotModified:
                 cmd.module.log.warning(
                     f"Command '{cmd.name}' triggered a message edit with no changes"

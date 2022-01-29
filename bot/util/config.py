@@ -27,20 +27,14 @@ class BotConfig:
         }
 
         for key, value in config.items():
-            if value == "" and key == "api_id":
-                value = 0
-            elif value == "":
-                value = None
-
+            if value == "":
+                value = 0 if key == "api_id" else None
             setattr(self, key, value)
 
     def __getattr__(self, name: str) -> Any:
         val = self.__getattribute__(name)
         if name == "download_path":
-            if val:
-                return AsyncPath(val)
-
-            return AsyncPath(Path.home() / "downloads")
+            return AsyncPath(val) if val else AsyncPath(Path.home() / "downloads")
         if name == "gdrive_index_link":
             return val.rstrip("/") if val is not None else val
         if name == "gdrive_secret":

@@ -359,17 +359,16 @@ class DirectLinks:
 
                     try:
                         result = None
-                        if expression[0] == "%" and expression[2] == "%":
-                            first_result = numbers[0] % numbers[1]
-                            second_result = numbers[2] % numbers[3]
-                            if expression[1] == "+":
-                                result = str(first_result + second_result)
-                            elif expression[1] == "-":
-                                result = str(first_result - second_result)
-                            else:
-                                raise ValueError("Unexpected value to calculate")
-                        else:
+                        if expression[0] != "%" or expression[2] != "%":
                             raise ValueError("Unexpected results of expression")
+                        first_result = numbers[0] % numbers[1]
+                        second_result = numbers[2] % numbers[3]
+                        if expression[1] == "+":
+                            result = str(first_result + second_result)
+                        elif expression[1] == "-":
+                            result = str(first_result - second_result)
+                        else:
+                            raise ValueError("Unexpected value to calculate")
                     except IndexError:
                         raise ValueError("Unexpected results of array")
                     else:
